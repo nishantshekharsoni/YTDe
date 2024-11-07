@@ -113,6 +113,7 @@ def download_video(url, output_path="downloads/single_videos",quality = 0):
 
 
 
+
 def download_audio(url, output_path="downloads/single_audios"):
     output_path = os.path.abspath(output_path)
 
@@ -133,7 +134,6 @@ def download_audio(url, output_path="downloads/single_audios"):
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
-
             print("\nAudio download process completed.")
 
             # List files in the directory
@@ -145,23 +145,20 @@ def download_audio(url, output_path="downloads/single_audios"):
 
             # Use the first .m4a file found
             audio_filename = os.path.join(output_path, m4a_files[0])
-
-            # Generate output filename
             output_filename = os.path.splitext(audio_filename)[0] + '_.mp3'
 
-            # Escape filenames for shell
-            audio_filename_escaped = shlex.quote(audio_filename)
-            output_filename_escaped = shlex.quote(output_filename)
-
-            ffmpeg_cmd = f'ffmpeg -i {audio_filename_escaped} -c:a libmp3lame -b:a 320k {output_filename_escaped}'
+            ffmpeg_cmd = [
+                'ffmpeg', '-i', audio_filename, '-c:a', 'libmp3lame', '-b:a', '320k', output_filename
+            ]
 
             try:
-                subprocess.run(ffmpeg_cmd, shell=True, check=True, stderr=subprocess.PIPE)
+                subprocess.run(ffmpeg_cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 print("Conversion successful!")
                 
+                # Remove the original .m4a file after conversion
                 os.remove(audio_filename)
             except subprocess.CalledProcessError as e:
-                print(f"An error occurred during conversion: {e.stderr.decode()}")
+                print(f"An error occurred during conversion: {e}")
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
