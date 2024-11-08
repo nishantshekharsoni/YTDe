@@ -124,11 +124,6 @@ def download_audio(url, output_path="downloads/single_audios"):
         'verbose': False,
         'quiet': True,
         'no_warnings': True,
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'm4a',
-        }],
-        'postprocessor_args': ['-b:a', '320k'],
     }
 
     try:
